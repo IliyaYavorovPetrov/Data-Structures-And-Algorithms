@@ -103,12 +103,11 @@ int main()
     quickSort(tempQuick, 0, tempQuick.size() - 1);
     tempQuick == sortedInput ? result.push_back("Quick Sort passed\n") : result.push_back("Quick Sort not passed\n");
 
-     // Result
+    // Result
     for (auto &&i : result)
     {
         std::cout << i;
     }
-
 
     return 0;
 }

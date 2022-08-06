@@ -65,7 +65,8 @@ std::vector<int> insertionSort(std::vector<int> input)
     return input;
 }
 
-int main() {
+int main() 
+{
     std::vector<int> input = {3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48};
 
     std::vector<int> sortedInput = input;
