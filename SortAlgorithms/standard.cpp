@@ -106,7 +106,7 @@ int main()
     // Result
     for (auto &&i : result)
     {
-        std::cout << i;
+        printf("%d", i);
     }
 
     return 0;
