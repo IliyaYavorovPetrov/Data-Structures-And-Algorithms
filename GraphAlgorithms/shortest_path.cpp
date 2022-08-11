@@ -4,6 +4,10 @@
 // FIND SHORTEST PATH IN UNWEIGHTED GRAPH
 std::unordered_map<int, int> bfs(std::unordered_map<int, std::vector<int>> &adj, int curr)
 {
+    if (adj.empty()) {
+        return std::unordered_map<int, int>();
+    }
+    
     std::unordered_map<int, bool> visited;
     std::unordered_map<int, int> distance;
 
@@ -80,6 +84,10 @@ public:
 // FIND SHORTEST PATH IN WEIGHTED GRAPH
 std::unordered_map<int, int> dijikstra(std::unordered_map<int, std::vector<std::pair<int, int>>> &adj, int curr)
 {
+    if (adj.empty()) {
+        return std::unordered_map<int, int>();
+    }
+
     std::unordered_map<int, bool> visited;
     std::unordered_map<int, int> distance;
 
