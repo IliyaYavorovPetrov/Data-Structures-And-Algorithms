@@ -1,32 +1,37 @@
 #include <bits/stdc++.h>
 
+typedef std::unordered_map<int, std::vector<int>> adj_bfs;
+typedef std::unordered_map<int, bool> m_vis_bfs;
+typedef std::unordered_map<int, int> m_dist_bfs;
+typedef std::unordered_map<int, std::list<int>> m_paths_bfs;
+typedef std::unordered_map<int, std::pair<int, std::list<int>>> output_bfs;
+
 // WORST: O(E*LOGV)
 // FIND SHORTEST PATH IN UNWEIGHTED GRAPH
-std::unordered_map<int, int> bfs(std::unordered_map<int, std::vector<int>> &adj, int curr)
+output_bfs bfs(adj_bfs adj, int curr)
 {
-    if (adj.empty()) {
-        return std::unordered_map<int, int>();
-    }
-    
-    std::unordered_map<int, bool> visited;
-    std::unordered_map<int, int> distance;
-
-    // GET PATH
-    std::unordered_map<int, std::list<int>> paths;
-
-    for (auto elem : adj)
+    if (adj.empty())
     {
-        visited[elem.first] = false;
-        distance[elem.first] = INT_MAX;
+        return output_bfs();
+    }
 
-        // GET PATH
-        paths[elem.first] = std::list<int>();
+    m_vis_bfs visited;
+    m_dist_bfs distance;
+    m_paths_bfs path;
+    for (auto x : adj)
+    {
+        auto from = x.first;
+        auto to = x.second;
+
+        visited[from] = false;
+        distance[from] = INT_MAX;
+        path[from] = std::list<int>();
     }
 
     distance[curr] = 0;
+    path[curr].push_back(curr);
     std::queue<int> next;
     next.push(curr);
-
     while (!next.empty())
     {
         auto temp = next.front();
@@ -40,29 +45,27 @@ std::unordered_map<int, int> bfs(std::unordered_map<int, std::vector<int>> &adj,
 
         for (auto x : adj[temp])
         {
-            int neighbour = x;
+            auto neighbour = x;
             int dist = distance[temp] + 1;
             if (distance[neighbour] > dist)
             {
                 distance[neighbour] = dist;
                 next.push(neighbour);
 
-                // GET PATH
-                if (!paths[neighbour].empty())
-                {
-                    paths[neighbour].clear();
-                    paths[neighbour] = paths[temp];
-                }
-            }
-            // GET PATH
-            if (!visited[neighbour])
-            {
-                paths[neighbour].push_back(temp);
+                path[neighbour] = path[temp];
+                path[neighbour].push_back(neighbour);
             }
         }
     }
 
-    return distance;
+    output_bfs output;
+    for (auto x : adj)
+    {
+        auto node = x.first;
+        output[node] = {distance[node], path[node]};
+    }
+
+    return output;
 }
 
 // (Dijikstra) Custom Compare Priority Queue
@@ -80,33 +83,39 @@ public:
     }
 };
 
+typedef std::unordered_map<int, std::vector<std::pair<int, int>>> adj_dij;
+typedef std::unordered_map<int, bool> m_vis_dij;
+typedef std::unordered_map<int, int> m_dist_dij;
+typedef std::unordered_map<int, std::list<std::pair<int, int>>> m_paths_dij;
+typedef std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, Compare> frontier_dij;
+typedef std::unordered_map<int, std::pair<int, std::list<std::pair<int, int>>>> output_dij;
+
 // WORST: O(E*LOGV)
 // FIND SHORTEST PATH IN WEIGHTED GRAPH
-std::unordered_map<int, int> dijikstra(std::unordered_map<int, std::vector<std::pair<int, int>>> &adj, int curr)
+output_dij dijkstra(adj_dij adj, int curr)
 {
-    if (adj.empty()) {
-        return std::unordered_map<int, int>();
+    if (adj.empty())
+    {
+        return output_dij();
     }
 
-    std::unordered_map<int, bool> visited;
-    std::unordered_map<int, int> distance;
-
-    // GET PATH
-    std::unordered_map<int, std::list<int>> paths;
-
-    for (auto elem : adj)
+    m_vis_dij visited;
+    m_dist_dij distance;
+    m_paths_dij path;
+    for (auto x : adj)
     {
-        visited[elem.first] = false;
-        distance[elem.first] = INT_MAX;
+        auto from = x.first;
+        auto to = x.second;
 
-        // GET PATH
-        paths[elem.first] = std::list<int>();
+        visited[from] = false;
+        distance[from] = INT_MAX;
+        path[from] = std::list<std::pair<int, int>>();
     }
 
     distance[curr] = 0;
-    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, Compare> next;
+    path[curr].push_back({curr, 0});
+    frontier_dij next;
     next.push({curr, 0});
-
     while (!next.empty())
     {
         auto temp = next.top();
@@ -120,72 +129,107 @@ std::unordered_map<int, int> dijikstra(std::unordered_map<int, std::vector<std::
 
         for (auto x : adj[temp.first])
         {
-            int neighbour = x.first;
-            int dist = distance[temp.first] + x.second;
+            auto neighbour = x.first;
+            auto dist = distance[temp.first] + x.second;
             if (distance[neighbour] > dist)
             {
                 distance[neighbour] = dist;
-                next.push(x);
+                next.push({neighbour, dist});
 
-                // GET PATH
-                if (!paths[neighbour].empty())
-                {
-                    paths[neighbour].clear();
-                    paths[neighbour] = paths[neighbour];
-                }
-            }
-            // GET PATH
-            if (!visited[neighbour])
-            {
-                paths[neighbour].push_back(temp.first);
+                path[neighbour] = path[temp.first];
+                path[neighbour].push_back({neighbour, dist});
             }
         }
     }
 
-    return distance;
+    output_dij output;
+    for (auto x : adj)
+    {
+        auto node = x.first;
+        output[node] = {distance[node], path[node]};
+    }
+
+    return output;
 }
 
 int main()
 {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
     // BFS
     {
-        std::unordered_map<int, std::vector<int>> adj;
-        adj[0].push_back(1);
-        adj[1].push_back(0);
-        adj[0].push_back(3);
-        adj[3].push_back(0);
-        adj[1].push_back(2);
-        adj[2].push_back(1);
-        adj[1].push_back(3);
-        adj[3].push_back(1);
-        adj[2].push_back(3);
-        adj[3].push_back(2);
+        adj_bfs adj;
+        auto add = [&adj](int a, int b)
+        {
+            adj[a].push_back(b);
+            adj[b].push_back(a);
+        };
+        add(3, 17);
+        add(3, 42);
+        add(3, 81);
+        add(17, 42);
+        add(42, 11);
+        add(42, 57);
+        add(42, 81);
+        add(11, 57);
+        add(11, 23);
+        add(57, 81);
+        add(57, 47);
+        add(57, 0);
+        add(57, 23);
+        add(0, 23);
 
-        auto result = bfs(adj, 0);
+        int start = 3;
+        auto result = bfs(adj, start);
         printf("BFS\n");
+        printf("start: %d\n", start);
         for (auto x : result)
         {
-            printf("%d: %d\n", x.first, x.second);
+            printf("to: %d  distance: %d path: ", x.first, x.second.first);
+            for (auto y : x.second.second)
+            {
+                printf("%d ", y);
+            }
+            printf("\n");
         }
     }
 
-    // Dijkstra
+    // Dikstra
     {
-        std::unordered_map<int, std::vector<std::pair<int, int>>> adj;
-        adj[1].push_back({2, 24});
-        adj[2].push_back({1, 24});
-        adj[1].push_back({4, 20});
-        adj[4].push_back({1, 20});
-        adj[3].push_back({1, 3});
-        adj[1].push_back({3, 3});
-        adj[4].push_back({3, 12});
-        adj[3].push_back({4, 12});
+        adj_dij adj;
+        auto add = [&adj](int a, int b, int c)
+        {
+            adj[a].push_back({b, c});
+            adj[b].push_back({a, c});
+        };
+        add(3, 17, 47);
+        add(3, 42, 3);
+        add(3, 81, 100);
+        add(17, 42, 8);
+        add(42, 11, 18);
+        add(42, 57, 34);
+        add(42, 81, 57);
+        add(11, 57, 12);
+        add(11, 23, 35);
+        add(57, 81, 17);
+        add(57, 47, 15);
+        add(57, 0, 24);
+        add(57, 23, 6);
+        add(0, 23, 2);
 
-        auto result = dijikstra(adj, 1);
-        printf("Dijkstra\n");
+        int start = 3;
+        auto result = dijkstra(adj, start);
+        printf("Dikstra\n");
+        printf("start: %d\n", start);
         for (auto x : result)
         {
-            printf("%d: %d\n", x.first, x.second);
+            printf("to: %d  distance: %d path: ", x.first, x.second.first);
+            for (auto y : x.second.second)
+            {
+                printf("%d ", y.first);
+            }
+            printf("\n");
         }
     }
 
