@@ -101,6 +101,7 @@ typedef std::list<std::tuple<int, int, int>> l_path_kruskal;
 typedef std::vector<Edge> v_all_endges_kruskal;
 typedef std::list<std::tuple<int, int, int>> output_kruskal;
 
+// WORST: O(E*LOGE)
 output_kruskal kruskal(adj_kruskal adj)
 {
     if (adj.empty())
