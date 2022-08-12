@@ -97,9 +97,9 @@ struct Edge
 typedef std::unordered_map<int, std::vector<std::pair<int, int>>> adj_kruskal;
 typedef std::unordered_map<int, bool> m_vis_kruskal;
 typedef std::unordered_map<int, int> m_dist_kruskal;
-typedef std::list<std::tuple<int ,int, int>> l_path_kruskal;
+typedef std::list<std::tuple<int, int, int>> l_path_kruskal;
 typedef std::vector<Edge> v_all_endges_kruskal;
-typedef std::list<std::tuple<int ,int ,int>> output_kruskal;
+typedef std::list<std::tuple<int, int, int>> output_kruskal;
 
 output_kruskal kruskal(adj_kruskal adj)
 {
@@ -109,8 +109,10 @@ output_kruskal kruskal(adj_kruskal adj)
     }
 
     v_all_endges_kruskal all_edges;
-    for (auto x : adj) {
-        for (auto y : x.second) {
+    for (auto x : adj)
+    {
+        for (auto y : x.second)
+        {
             Edge temp;
             temp.from = x.first;
             temp.to = y.first;
@@ -121,21 +123,26 @@ output_kruskal kruskal(adj_kruskal adj)
     std::sort(all_edges.begin(), all_edges.end());
 
     l_path_kruskal path;
-    std::unordered_map<int ,int> components;
+    std::unordered_map<int, int> components;
     int counter = 0;
-    for (auto x : adj) {
+    for (auto x : adj)
+    {
         components[x.first] = counter;
         ++counter;
     }
 
-    for (auto x : all_edges) {
-        if (components[x.from] != components[x.to]) {
+    for (auto x : all_edges)
+    {
+        if (components[x.from] != components[x.to])
+        {
             path.push_back({x.from, x.to, x.weight});
             auto old_c = components[x.from];
             auto new_c = components[x.to];
-            for (int  i = 0; i < components.size(); ++i) {
-                if (components[i] == old_c) {
-                    components[i] = new_c; 
+            for (int i = 0; i < components.size(); ++i)
+            {
+                if (components[i] == old_c)
+                {
+                    components[i] = new_c;
                 }
             }
         }
